@@ -1,0 +1,62 @@
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
+# Create a pipeline for numeric imputation
+numeric_imputer = SimpleImputer(strategy='mean')
+
+# Create a pipeline for categorical imputation
+categorical_imputer = SimpleImputer(strategy='most_frequent')
+
+# Create a pipeline for one hot encoding
+one_hot_encoder = OneHotEncoder()
+
+# Create a column transformer to apply the imputation and one hot encoding pipelines
+column_transformer = ColumnTransformer([
+    ('numeric_imputer', numeric_imputer, ['numeric_features']),
+    ('categorical_imputer', categorical_imputer, ['categorical_features']),
+    ('one_hot_encoder', one_hot_encoder, ['categorical_features'])
+])
+
+# Create a standard scaler
+scaler = StandardScaler()
+
+# Create a pipeline to apply the column transformer and standard scaler
+preprocessing_pipeline = Pipeline([
+    ('column_transformer', column_transformer),
+    ('scaler', scaler)
+])
+
+# Fit the preprocessing pipeline to the data
+preprocessing_pipeline.fit(X)
+
+# Transform the data using the preprocessing pipeline
+X_transformed = preprocessing_pipeline.transform(X)
+
+
+#################
+
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+
+# Create the pipeline
+pipeline = Pipeline([
+    ('imputer_numeric', SimpleImputer(strategy='median')),
+    ('imputer_categorical', SimpleImputer(strategy='most_frequent')),
+    ('onehotencoder', OneHotEncoder(handle_unknown='ignore')),
+    ('standardscaler', StandardScaler()),
+    ('logisticregression', LogisticRegression())
+])
+
+# Fit the pipeline to the training data
+pipeline.fit(X_train, y_train)
+
+# Predict the labels on the test data
+y_pred = pipeline.predict(X_test)
+
+# Evaluate the model
+auc = roc_auc_score(y_test, y_pred)
+print('AUC:', auc)
